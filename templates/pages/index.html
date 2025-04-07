@@ -1,0 +1,409 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}Home | Asistenku AI | 2025 | Browser Agent Automation{% endblock %}
+
+{% block styles %}
+<!-- Add your custom styles here -->
+{% endblock %}
+
+{% block content %}
+<!-- Tabs Navigation -->
+<div class="w-full flex items-center space-x-6 py-4">
+  <button class="tab-button text-md flex items-center space-x-2 pb-2 border-b-2 border-transparent text-blue-400 active" data-tab="agent-settings">
+  ⚙️ <span class="mx-2">Agent Settings</span>
+  </button>
+  <button class="tab-button text-md flex items-center space-x-2 pb-2 border-b-2 border-transparent text-gray-400 hover:text-blue-400" data-tab="llm-settings">
+  🔧 <span class="mx-2">LLM Settings</span>
+  </button>
+  <button class="tab-button text-md flex items-center space-x-2 pb-2 border-b-2 border-transparent text-gray-400 hover:text-blue-400" data-tab="browser-settings">
+  🌐 <span class="mx-2">Browser Settings</span>
+  </button>
+  <button class="tab-button text-md flex items-center space-x-2 pb-2 border-b-2 border-transparent text-gray-400 hover:text-blue-400" data-tab="run-agent">
+  🤖 <span class="mx-2">Run Agent</span>
+  </button>
+  <button class="tab-button text-md flex items-center space-x-2 pb-2 border-b-2 border-transparent text-gray-400 hover:text-blue-400" data-tab="account">
+  🧐 <span class="mx-2">Account</span>
+  </button>
+</div>
+
+<!-- Tab Contents -->
+<div class="tab-content clickable bg-white p-6 rounded-lg shadow-md">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="mt-4">
+    <div class="bg-{{ category }}-100 border border-{{ category }}-400 text-{{ category }}-700 px-4 py-3 rounded-lg relative" role="alert">
+      <span class="block sm:inline">{{ message }}</span>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <!-- ⚙️ Agent Settings -->
+  <form id="task-form">
+    <div id="agent-settings" class="tab-item">
+      <div class="space-y-4">
+        <div class="border-b border-gray-200 pb-4">
+          <label for="agent_type" class="block text-sm font-medium">Agent Type</label>
+          <p class="mt-2 text-xs text-gray-500">Select the type of agent to use</p>
+          <select id="agent_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+            <option value="custom">custom</option>
+            <option value="org">org</option>
+          </select>
+        </div>
+        <div class="border-b border-gray-200 pb-4">
+          <label for="max_steps" class="text-sm font-medium">Max Run Steps</label>
+          <div class="flex justify-between items-center">
+            <p class="mt-1 text-xs text-gray-500">Set the maximum number of steps to run the agent</p>
+            <span id="max_steps_value" class="text-sm font-semibold">100</span>
+          </div>
+          <input type="range" id="max_steps" class="w-full h-2 bg-gray-200 rounded-md" min="1" max="200" value="100">
+        </div>
+        <!-- Max Actions per Step Slider -->
+        <div class="border-b border-gray-200 pb-4 mt-4">
+          <label for="max_actions_per_step" class="text-sm font-medium">Max Actions per Step</label>
+          <div class="flex justify-between items-center">
+              <p class="mt-1 text-xs text-gray-500">Set the maximum number of actions to take per step</p>
+              <span id="max_actions_per_step_value" class="text-sm font-semibold">5</span>
+          </div>
+          <input type="range" id="max_actions_per_step" class="w-full h-2 bg-gray-200 rounded-md" min="1" max="20" value="5">
+        </div>
+        <!-- Checkbox Section -->
+        <div class="border-b border-gray-200 pb-4 mt-4">
+          <p class="mb-1 text-xs text-gray-500">Enable visual processing capabilities</p>
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" id="use_vision" checked class="h-4 w-4 text-green-400 border-gray-300 rounded">
+            <label for="use_vision" class="text-sm font-medium">Use Vision</label>
+          </div>
+        </div>
+        <!-- Max input tokens -->
+        <div class="border-b border-gray-200 pb-4 mt-4">
+          <label for="max_input_tokens" class="text-sm font-medium">Max Input Tokens</label>
+          <p class="mt-1 text-xs text-gray-500">Set the maximum number of input tokens</p>
+          <input type="number" id="max_input_tokens" class="w-full px-3 py-1 mt-2 border border-gray-300 rounded-md shadow-sm" value="200">
+        </div>
+      </div>
+    </div>
+    <!-- 🔧 LLM Settings -->
+    <div id="llm-settings" class="tab-item hidden">
+      <!-- Similar to above, build your form fields for LLM settings here -->
+      <div class="grid grid-cols-2 gap-4 border-b border-gray-200 pb-4">
+        <div>
+          <label for="provider" class="block text-sm font-medium">LLM Provider</label>
+          <p class="mt-2 text-xs text-gray-500">Select your preferred language model provider.</p>
+          <select id="provider" class="w-full p-2 mt-2 rounded-md border border-gray-300">
+            <option value="">-- Choose Provider --</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="openai">OpenAI</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="google">Google</option>
+            <option value="ollama">Ollama</option>
+            <option value="azure_openai">Azure OpenAI</option>
+            <option value="mistral">Mistral</option>
+            <option value="alibaba">Alibaba</option>
+            <option value="moonshot">Moonshot</option>
+          </select>
+        </div>
+        <div>
+          <label for="model" class="block text-sm font-medium">Model Name</label>
+          <p class="mt-2 text-xs text-gray-500">Select your preferred language model name.</p>
+          <select id="model" disabled class="w-full p-2 mt-2 rounded-md border border-gray-300">
+            <option value="">-- Choose Model --</option>
+          </select>
+        </div>
+      </div>
+      <!-- temperature with glider -->
+      <div class="border-b border-gray-200 pb-4 mt-4">
+        <label for="temperature" class="text-sm font-medium">Temperature</label>
+        <div class="flex justify-between items-center">
+          <p class="mt-1 text-xs text-gray-500">Set the temperature for sampling</p>
+          <span id="temperature_value" class="text-sm font-semibold">0.7</span>
+        </div>
+        <input type="range" id="temperature" class="w-full h-2 bg-gray-200 rounded-md" min="0.1" max="1.0" step="0.1" value="0.7">
+      </div>
+    </div>
+    <!-- 🌐 Browser Settings -->
+    <div id="browser-settings" class="tab-item hidden">
+      <!-- Browser-related settings -->
+      <!-- make 5 grid and checkbox on grid -->
+      <div class="grid grid-cols-4 gap-4 border-b border-gray-200 pb-4">
+        <!-- use own browser, keep browser open -->
+        <div class="border-r border-gray-200 pb-4">
+          <p class="mt-2 text-xs text-gray-500">Use your existing browser instance</p>
+          <div class="flex items-center space-x-2 mt-2">
+            <input type="checkbox" id="use_own_browser" checked class="h-4 w-4 text-green-400 border-gray-300 rounded cursor-pointer">
+            <label for="use_own_browser" class="text-xs font-medium cursor-pointer">Use Own Browser</label>
+          </div>
+        </div>
+        <div class="border-r border-gray-200 pb-4">
+          <p class="mt-2 text-xs text-gray-500">Keep Browser Open between Tasks</p>
+          <div class="flex items-center space-x-2 mt-2">
+            <input type="checkbox" id="keep_browser_open" checked class="h-4 w-4 text-green-400 border-gray-300 rounded cursor-pointer">
+            <label for="keep_browser_open" class="text-xs font-medium cursor-pointer">Keep Browser Open</label>
+          </div>
+        </div>
+        <div class="border-r border-gray-200 pb-4">
+          <p class="mt-2 text-xs text-gray-500">Run browser without User Interface</p>
+          <div class="flex items-center space-x-2 mt-2">
+            <input type="checkbox" id="handless_mode" class="h-4 w-4 text-green-400 border-gray-300 rounded cursor-pointer">
+            <label for="handless_mode" class="text-xs font-medium cursor-pointer">Handless Mode</label>
+          </div>
+        </div>
+        <div class="pb-4">
+          <p class="mt-2 text-xs text-gray-500">Disable browser security features</p>
+          <div class="flex items-center space-x-2 mt-2">
+            <input type="checkbox" id="disable_security" checked class="h-4 w-4 text-green-400 border-gray-300 rounded cursor-pointer">
+            <label for="disable_security" class="text-xs font-medium cursor-pointer">Disable Security</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Browser Size -->
+      <div class="grid grid-cols-2 gap-4 border-b border-gray-200 pb-4 mt-2">
+        <!-- use own browser, keep browser open -->
+        <!-- Window Width -->
+        <div class="pb-4 pr-4 border-r border-gray-200 h-full">
+          <label for="browser_width" class="text-sm font-medium">Window Width</label>
+          <p class="mt-1 text-xs text-gray-500">Set the width of the browser window</p>
+          <input type="number" id="browser_width" class="w-full px-3 py-1 mt-2 border border-gray-300 rounded-md shadow-sm" value="1024">
+        </div>
+
+        <!-- Window Height -->
+        <div class="pb-4">
+          <label for="browser_height" class="text-sm font-medium">Window Height</label>
+          <p class="mt-1 text-xs text-gray-500">Set the height of the browser window</p>
+          <input type="number" id="browser_height" class="w-full px-3 py-1 mt-2 border border-gray-300 rounded-md shadow-sm" value="768">
+        </div>
+      </div>
+
+      <!-- CDP URL -->
+      <div class="border-b border-gray-200 pb-4 mt-2">
+        <label for="cdp_url" class="text-sm font-medium">CDP URL</label>
+        <p class="mt-1 text-xs text-gray-500">Set the Chrome DevTools Protocol URL</p>
+        <input type="text" id="cdp_url" class="w-full px-3 py-1 mt-2 border border-gray-300 rounded-md shadow-sm" placeholder="http://localhost:9222">
+      </div>
+    </div>
+    <!-- 🤖 Run Agent -->
+    <div id="run-agent" class="tab-item hidden">
+      <!-- Run Agent Task Description, Additional information. -->
+      <div class="space-y-4">
+        <!-- Task Description -->
+        <div>
+          <label for="task" class="block text-sm font-medium">Task Description</label>
+          <p class="mt-2 text-xs text-gray-500">Enter the task description for the agent to run</p>
+          <textarea id="task" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g. Create a simple calculator program in Python..."></textarea>
+        </div>
+        <!-- Additional Information -->
+        <div class="border-b border-gray-200 pb-4">
+          <label for="additional_info" class="block text-sm font-medium">Additional Information</label>
+          <p class="mt-2 text-xs text-gray-500">Enter any additional information or context for the agent</p>
+          <textarea id="additional_info" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g. The calculator should support addition, subtraction, multiplication, and division..."></textarea>
+        </div>
+        <!-- button run agent and stop with gradient -->
+        <div class="flex justify-between items-center">
+          <button class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-md">Run Agent</button>
+          <button class="bg-gradient-to-r from-red-400 to-pink-500 text-white px-4 py-2 rounded-md">Stop Agent</button>
+        </div>
+      </div>
+    </div>
+  </form>
+  <!-- 🧐 Account -->
+  <div id="account" class="tab-item hidden">
+    <!-- Account Information -->
+    <div class="space-y-4">
+      <!-- Account Name -->
+      <div class="border-b border-gray-200 pb-4">
+        <label for="name" class="block text-sm font-medium">Full Name</label>
+        <p class="mt-2 text-xs text-gray-500">Enter your full name</p>
+        <input type="text" id="name" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm" placeholder="John Doe" value="John Doe">
+      </div>
+      <!-- Account Email -->
+      <div class="border-b border-gray-200 pb-4">
+        <label for="email" class="block text-sm font-medium">Email Address</label>
+        <p class="mt-2 text-xs text-gray-500">Enter your email address</p>
+        <input type="email" id="email" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm" placeholder="john.doe@mail.com" value="john.doe@mail.com" disabled>
+      </div>
+      <!-- Join Date and Expired Date -->
+      <div class="grid grid-cols-3 gap-4">
+        <!-- your package -->
+        <div>
+          <label for="package" class="block text-sm font-medium">Package</label>
+          <p class="mt-2 text-xs text-gray-500">Your account package</p>
+          <input type="text" disabled id="package" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm" value="Personal - $10/month">
+        </div>
+        <!-- join date -->
+        <div>
+          <label for="join_date" class="block text-sm font-medium">Join Date</label>
+          <p class="mt-2 text-xs text-gray-500">Your account join date</p>
+          <input type="date" disabled id="join_date" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm" value="2025-01-01">
+        </div>
+        <!-- expired date -->
+        <div>
+          <label for="expired_date" class="block text-sm font-medium">Expired Date</label>
+          <p class="mt-2 text-xs text-gray-500">Your account expired date</p>
+          <input type="date" disabled id="expired_date" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md shadow-sm" value="2025-04-01">
+        </div>
+      </div>
+      <!-- save, renew, logout -->
+      <div class="flex justify-between items-center">
+        <div>
+          <button class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-md">Save</button>
+          <button class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-4 py-2 rounded-md">Renew</button>
+        </div>
+        
+        <button id="logout-btn" class="bg-gradient-to-r from-red-400 to-pink-500 text-white px-4 py-2 rounded-md">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- sweetalert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  $(document).ready(function () {
+    // Logout button
+    $("#logout-btn").click(function() {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out from the session!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, logout!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          let csrfToken = "{{ csrf_token() }}";
+          $.post("/logout", { csrf_token: csrfToken }, function(response) {
+            Swal.fire({
+              title: "Logged out!",
+              text: "You have been logged out.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = "/login"; // Redirect ke halaman login
+            });
+          }).fail(function() {
+            Swal.fire("Error!", "Failed to log out.", "error");
+          });
+        }
+      });
+    });
+    // for tab navigation
+    $(".tab-button").click(function () {
+      // Hapus semua efek aktif
+      $(".tab-button").removeClass("text-blue-400 border-blue-400").addClass("text-gray-400 border-transparent");
+
+      // Tambahkan efek aktif ke tab yang diklik
+      $(this).addClass("text-blue-400 border-blue-400").removeClass("text-gray-400");
+
+      // Sembunyikan semua konten tab
+      $(".tab-item").addClass("hidden");
+
+      // Tampilkan konten tab yang dipilih
+      $("#" + $(this).data("tab")).removeClass("hidden");
+    });
+
+    // for range slider
+    $("#max_steps").on("input", function () {
+      $("#max_steps_value").text($(this).val());
+    });
+
+    $("#max_actions_per_step").on("input", function () {
+      $("#max_actions_per_step_value").text($(this).val());
+    });
+
+    $("#temperature").on("input", function () {
+      $("#temperature_value").text($(this).val());
+    });
+
+    // for select dropdown
+    var modelNames = {
+      "anthropic": ["claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620", "claude-3-opus-20240229"],
+      "openai": ["gpt-4o", "gpt-4", "gpt-3.5-turbo", "o3-mini"],
+      "deepseek": ["deepseek-chat", "deepseek-reasoner"],
+      "google": ["gemini-2.0-flash", "gemini-2.0-flash-thinking-exp", "gemini-1.5-flash-latest",
+                "gemini-1.5-flash-8b-latest", "gemini-2.0-flash-thinking-exp-01-21", "gemini-2.0-pro-exp-02-05"],
+      "ollama": ["qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b", "qwen2.5-coder:14b", "qwen2.5-coder:32b", "llama2:7b",
+                "deepseek-r1:14b", "deepseek-r1:32b"],
+      "azure_openai": ["gpt-4o", "gpt-4", "gpt-3.5-turbo"],
+      "mistral": ["mixtral-large-latest", "mistral-large-latest", "mistral-small-latest", "ministral-8b-latest"],
+      "alibaba": ["qwen-plus", "qwen-max", "qwen-turbo", "qwen-long"],
+      "moonshot": ["moonshot-v1-32k-vision-preview", "moonshot-v1-8k-vision-preview"],
+    };
+
+    // Event ketika provider berubah
+    $("#provider").change(function () {
+      var selectedProvider = $(this).val();
+      var modelSelect = $("#model");
+
+      // Aktifkan atau nonaktifkan model select berdasarkan provider yang dipilih
+      if (selectedProvider) {
+        modelSelect.prop("disabled", false);
+      } else {
+        modelSelect.prop("disabled", true);
+      }
+      // Kosongkan opsi model sebelumnya
+      modelSelect.empty().append('<option value="">-- Choose Model --</option>');
+
+      // Jika ada model untuk provider yang dipilih, tambahkan ke select
+      if (modelNames[selectedProvider]) {
+        $.each(modelNames[selectedProvider], function (index, model) {
+          modelSelect.append('<option value="' + model + '">' + model + '</option>');
+        });
+      }
+    });
+    
+    $("#task-form").submit(function(e) {
+      e.preventDefault();
+
+      csrfToken = "{{ csrf_token() }}";
+      formData = {
+        task: $("#task").val(),
+        agent_type: $("#agent_type").val(),
+        max_steps: $("#max_steps").val(),
+        max_actions_per_step: $("#max_actions_per_step").val(),
+        visual_processing: $("#visual_processing").is(":checked"),
+        max_input_tokens: $("#max_input_tokens").val(),
+        provider: $("#provider").val(),
+        model: $("#model").val(),
+        temperature: $("#temperature").val(),
+        use_own_browser: $("#use_own_browser").is(":checked"),
+        keep_browser_open: $("#keep_browser_open").is(":checked"),
+        handless_mode: $("#handless_mode").is(":checked"),
+        disable_security: $("#disable_security").is(":checked"),
+        browser_width: $("#browser_width").val(),
+        browser_height: $("#browser_height").val(),
+        cdp_url: $("#cdp_url").val(),
+        additional_info: $("#additional_info").val()
+      };
+
+      if(formData.task === "") {
+        Swal.fire("Error!", "Task description is required.", "error");
+        return;
+      }
+
+      $.ajax({
+        url: "/run_task",
+        type: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken
+        },
+        contentType: "application/json",
+        data: JSON.stringify(formData),
+        success: function(response) {
+          console.log(response);
+        },
+        error: function(xhr) {
+          let errorMessage = xhr.responseJSON ? xhr.responseJSON.error : "Something went wrong. Please try again.";
+          console.log(errorMessage);
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

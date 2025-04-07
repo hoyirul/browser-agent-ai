@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error {{ e.code }} - {{ e.message }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-100">
+  <div class="text-center rounded-lg p-8">
+    <h1 class="text-6xl font-bold text-red-500">{{ e.code }}</h1>
+    <h2 class="text-2xl font-semibold text-gray-800 mt-2">{{ e.message }}</h2>
+    <p class="text-gray-600 mt-4">{{ e.description }}</p>
+    <a href="javascript:history.go(-1)" 
+       class="mt-6 inline-block px-6 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500">
+      Kembali
+    </a>
+  </div>
+</body>
+</html>
