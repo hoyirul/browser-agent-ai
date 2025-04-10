@@ -22,7 +22,7 @@ from browser_use.browser.context import (
 )
 from browser_use.agent.service import Agent
 
-API_URL = "http://192.168.1.11:8000/api/v1"
+API_URL = "http://31.57.224.118:8011/api/v1"
 
 # Load environment variables
 load_dotenv()
